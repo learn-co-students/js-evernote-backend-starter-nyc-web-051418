@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css?family=Didact+Gothic|IBM+Plex+Mono|Poppins');
+
+* {
+  font-family: 'Didact Gothic'
+}
+
+h2 {
+  font-family: 'IBM Plex Mono'
+}
+
+.nav-bar {
+  width: 100%;
+  background-image: linear-gradient(to right top, #8C33E3, #696CE8, #4A9EEC);
+     background-repeat: no-repeat;
+  font-family: 'IBM Plex Mono';
+  font-size: 16px;
+  letter-spacing: 1.5px;
+  font-weight: bolder;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.nav-item {
+  list-style: none;
+  color: white;
+  padding: 4px;
+}
+
+.filter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed grey;
+}
+
+input {
+  font-size: 24px;
+  height: 40px;
+  width: 100%;
+  border: none;
+}
+
+input::placeholder {
+  padding-left: 10px;
+  color: rgba(0, 0, 0, 0.55);
+  font-weight: bolder;
+}
+
+#container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+
+.master-detail-element {
+  float:left;
+  margin: 10px 0px;
+  padding: 20px;
+  border: 2px dashed grey;
+}
+
+#sidebar {
+  width:25%;
+  overflow: scroll;
+}
+
+
+#detail {
+  width:75%;
+}
+
+button {
+  width: 125px;
+  border-radius: 200px;
+  margin-right: 10px;
+  padding: 5px 35px;
+  border: 0px;
+  background-image: linear-gradient(to right top, #8C33E3, #696CE8, #4A9EEC);
+  background-repeat: no-repeat;
+  color: white;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+button:hover, .nav-bar:hover {
+  background-image: linear-gradient(to right top, #8A2387, #E94057, #F27121);
+  background-repeat: no-repeat;
+}
