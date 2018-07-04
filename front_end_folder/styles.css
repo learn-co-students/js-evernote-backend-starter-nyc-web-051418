@@ -37,17 +37,18 @@ h2 {
   border: 2px dashed grey;
 }
 
-input {
+input, textarea {
   font-size: 24px;
   height: 40px;
   width: 100%;
-  border: none;
+  background: grey;
 }
 
 input::placeholder {
   padding-left: 10px;
   color: rgba(0, 0, 0, 0.55);
   font-weight: bolder;
+  background: grey;
 }
 
 #container {
@@ -75,7 +76,7 @@ input::placeholder {
   width:75%;
 }
 
-button {
+button, .btn {
   width: 125px;
   border-radius: 200px;
   margin-right: 10px;
