@@ -12,14 +12,31 @@ document.addEventListener("DOMContentLoaded", function(event) {
     detail.innerHTML = builtNote;
   }
 
-  function triggerDisplayMessage(noteId) {
-    const clickedNote = notes.find(note => note.id === parseInt(noteId))
-    const builtNote = buildDisplayedMsg(clickedNote)
-    displayNote(builtNote);
+  function findNote(noteId) {
+    return notes.find(note => note.id === parseInt(noteId));
   }
 
-  function emptyDetailedNotes(message) {
-    detail.innerHTML = `<p>${message}</p>`;
+  function filterNotes(values) {
+    return notes.filter(note => note.title.includes(values));
+  }
+
+  function triggerDisplayMessage(noteId, noteFullData) {
+    if (noteFullData === undefined) {
+      const clickedNote = findNote(noteId);
+      const builtNote = buildDisplayedMsg(clickedNote);
+      displayNote(builtNote);
+    } else {
+      const builtNote = buildDisplayedMsg(noteFullData);
+      displayNote(builtNote);
+    }
+  }
+
+  function emptyDetailedNotes(message, addition) {
+    if (addition === "addition"){
+      detail.innerHTML += `<p>${message}</p>`;
+    } else {
+      detail.innerHTML = `<p>${message}</p>`;
+    }
   };
 
   //forms
@@ -39,6 +56,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
       detail.innerHTML = returnForm(noteId, "New");
     } else {
       detail.innerHTML += returnForm(noteId, "Edit");
+      const previousNoteData = findNote(noteId);
+      document.getElementById('titleInput').value = `${previousNoteData.title}`;
+      document.getElementById('descriptionInput').value = `${previousNoteData.body}`;
     }
   };
 
@@ -60,18 +80,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
   }
 
   function createNote(title, description){
-    emptyDetailedNotes("Your note was created successfully.");
     const newUrl = `${url}`;
     const method = "POST"
     const headers = {"Content-Type": "application/json"}
     const payload = JSON.stringify({title: title, body: description, user_id:2 })
     const configOrb = {method: method, headers: headers, body: payload }
-    // return fetch(newUrl, configOrb).then(r => r.json()).then( r => {init(); return r }).then(resp => triggerDisplayMessage(`${resp.id}`));
+    return fetch(newUrl, configOrb).then(r => r.json()).then(resp => {triggerDisplayMessage(resp.id, resp); emptyDetailedNotes("Your note was created successfully.", "addition");
+ }).then(init);
   }
 
-  //event static listeners
+  //event listeners w/o routing
   document.getElementById('create').addEventListener("click", function(event) {
     addFormReady("new")
+  })
+
+  document.getElementById('search-bar').addEventListener("input", function(event) {
+    let searchValues = this.value;
+    if (searchValues.match(/[a-z]/i)){
+      let filteredNotes = filterNotes(searchValues);
+      displayAllMsg(filteredNotes);
+    } else {
+      displayAllMsg(notes);
+    }
   })
 
   document.getElementById('sidebar').addEventListener("click", function(event) {
@@ -82,22 +112,36 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
   })
 
+  //router functions
+  function routerEdit(eventTarget) {
+    eventTarget.style.display = "none";
+    addFormReady(eventTarget.dataset.editId);
+  }
+  function routerSubmitEditBtn(eventArg) {
+    eventArg.preventDefault();
+    const editId = eventArg.target.dataset.submitId
+    const editTitle = document.getElementById('titleInput').value
+    const editDescription = document.getElementById('descriptionInput').value
+    updateNote(editId,editTitle, editDescription);
+  }
+
+  function routerSubmitNewBtn(eventArg) {
+    eventArg.preventDefault();
+    const editTitle = document.getElementById('titleInput').value
+    const editDescription = document.getElementById('descriptionInput').value
+    createNote(editTitle, editDescription);
+  }
+
+  //listener router
   document.getElementById('detail').addEventListener("click", function(event) {
     if (event.target.id === "edit") {
-      addFormReady(event.target.dataset.editId);
+      routerEdit(event.target)
     } else if (event.target.id === "delete") {
       deleteNote(event.target.dataset.deleteId)
     } else if (event.target.dataset.action === "submitEditBtn") {
-      event.preventDefault();
-      const editId = event.target.dataset.submitId
-      const editTitle = document.getElementById('titleInput').value
-      const editDescription = document.getElementById('descriptionInput').value
-      updateNote(editId,editTitle, editDescription);
+      routerSubmitEditBtn(event)
     } else if (event.target.dataset.action === "submitNewBtn") {
-      event.preventDefault();
-      const editTitle = document.getElementById('titleInput').value
-      const editDescription = document.getElementById('descriptionInput').value
-      createNote(editTitle, editDescription);
+      routerSubmitNewBtn(event)
     }
   })
 
@@ -105,11 +149,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
   function buildSideNote(note) {
     return `<div><h2 id="${note.id}" data-action="openMsg"> ${note.title}</h2><p>${note.body.slice(0,20)}...</p></div>`
   };
-  function displayAllMsg() {
-    sidebar.innerHTML = notes.map(note => buildSideNote(note)).join('');
+  function displayAllMsg(notesVar) {
+    sidebar.innerHTML = notesVar.map(note => buildSideNote(note)).join('');
   }
 
-  //initial fetch
+  //origin: fetch and display
   function saveNotes(noteTitle, noteBody, noteId) {
     const noteEl = {
       "id": noteId,
@@ -123,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     notesObjs.forEach(function(note) {
       saveNotes(note.title, note.body, note.id);
     })
-    displayAllMsg();
+    displayAllMsg(notes);
   }
 
   function init() {
